@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="140" height="80" viewBox="0 0 140 80">
+  <rect width="140" height="80" rx="10" fill="#fff"/>
+  <g transform="translate(10,10)">
+    <rect width="120" height="60" rx="8" fill="#fff2f2" stroke="#ff6b6b"/>
+    <text x="12" y="28" font-family="Inter, Arial" font-size="12" fill="#a00">Phish — suspicious link</text>
+  </g>
+</svg>
