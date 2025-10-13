@@ -1,0 +1,111 @@
+/* Simple ocean-themed styling matching existing Shark Week Lite look */
+:root{
+  --bg1:#0f6aa7;
+  --bg2:#49c5d6;
+  --card:#ffffff;
+  --muted:#6b7885;
+  --accent:#ffca28;
+  --danger:#ff6b6b;
+  --success:#3bd671;
+  --radius:12px;
+  --shadow: 0 6px 18px rgba(8,20,30,0.18);
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  min-height:100vh;
+  background: linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 100%);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:32px;
+  color:#08202b;
+}
+
+/* Container centers page content for embed on SharePoint */
+.container{
+  width:100%;
+  max-width:900px;
+}
+
+/* Header */
+.header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:14px;
+}
+.title-banner{
+  height:60px;
+}
+.shark-icon{height:46px; opacity:0.95;}
+
+/* Card */
+.card{
+  background:var(--card);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:22px;
+  min-height:320px;
+}
+
+/* Center and hidden */
+.center{ text-align:center }
+.hidden{ display:none }
+
+/* How to play */
+.howto{ color:var(--muted); margin:6px 0 18px; }
+
+/* Message box */
+.message{
+  background: #f6fbff;
+  border-radius:10px;
+  padding:18px;
+  margin:10px 0 18px;
+  font-size:1.05rem;
+  line-height:1.4;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+  min-height:80px;
+  display:flex;
+  align-items:center;
+}
+
+/* Buttons */
+.btn{
+  border:0;
+  padding:10px 16px;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:600;
+  margin:6px;
+}
+.btn.primary{ background: linear-gradient(90deg,#3b9bd6,#00c2d1); color:white; }
+.btn.danger{ background:var(--danger); color:white; }
+.btn.success{ background:var(--success); color:white; }
+.btn:disabled{ opacity:0.5; cursor:not-allowed; }
+
+/* Explanation */
+.explanation{
+  margin-top:12px;
+  padding:12px;
+  border-radius:8px;
+  background:#fff8e1;
+  color:#6b4a00;
+  border:1px solid rgba(0,0,0,0.04);
+}
+
+/* Progress */
+#progress{ font-size:0.9rem; color:var(--muted); margin-bottom:8px }
+
+/* Footer */
+.footer{ color:rgba(255,255,255,0.9); margin-top:12px; text-align:center; }
+
+/* Responsive */
+@media (max-width:520px){
+  .title-banner{ height:44px }
+  .card{ padding:14px }
+  .message{ font-size:0.95rem; min-height:72px }
+}

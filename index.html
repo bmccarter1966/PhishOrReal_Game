@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Phish or Real? — Shark Week Lite</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <img src="assets/title-banner.svg" alt="Phish or Real?" class="title-banner">
+      <div class="header-right">
+        <img src="assets/shark-icon.svg" alt="shark" class="shark-icon">
+      </div>
+    </header>
+
+    <main class="card" id="gameCard">
+      <div id="startScreen" class="center">
+        <h2>Phish or Real?</h2>
+        <p class="howto">Decide if each message is <strong>Real</strong> or a <strong>Phish</strong>. You will get a short explanation after every choice.</p>
+        <button id="startBtn" class="btn primary">Start Game</button>
+      </div>
+
+      <div id="questionScreen" class="hidden">
+        <div id="progress">Question <span id="qNum">1</span> / <span id="qTotal">10</span></div>
+        <div id="messageBox" class="message">Loading...</div>
+        <div class="actions">
+          <button id="btnPhish" class="btn danger">Phish</button>
+          <button id="btnReal" class="btn success">Real</button>
+        </div>
+        <div id="explanation" class="explanation hidden"></div>
+        <div class="nav">
+          <button id="nextBtn" class="btn" disabled>Next</button>
+        </div>
+      </div>
+
+      <div id="endScreen" class="hidden center">
+        <h2 id="scoreTitle">You scored 0/10</h2>
+        <p id="scoreMsg">Nice work!</p>
+        <button id="playAgainBtn" class="btn primary">Play Again</button>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <small>Created for Shark Week Lite — Cybersecurity Awareness</small>
+    </footer>
+  </div>
+
+<script src="script.js"></script>
+</body>
+</html>
