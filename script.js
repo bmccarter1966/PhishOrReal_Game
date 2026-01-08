@@ -1,4 +1,5 @@
 // phish-or-real game logic with Power Automate integration
+
 const QUESTIONS = [
   {
     text: "URGENT: Your Microsoft 365 password expires today. Click here to reset now: http://secure-login365.co",
@@ -60,56 +61,66 @@ let playerName = "";
 
 const FLOW_URL = "YOUR_FLOW_URL_HERE"; // <-- Paste your Power Automate HTTP trigger URL here
 
-function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]] } return a }
-
-function init(){
-  const startBtn = document.getElementById('startBtn');
-  const btnPhish = document.getElementById('btnPhish');
-  const btnReal = document.getElementById('btnReal');
-  const nextBtn = document.getElementById('nextBtn');
-  const playAgainBtn = document.getElementById('playAgainBtn');
-
-  startBtn.addEventListener('click', startGame);
-  btnPhish.addEventListener('click', ()=>answer('Phish'));
-  btnReal.addEventListener('click', ()=>answer('Real'));
-  nextBtn.addEventListener('click', nextQ);
-  playAgainBtn.addEventListener('click', startGame);
+// Shuffle array helper
+function shuffle(a){
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
 }
 
+// Initialize event listeners
+function init(){
+  document.getElementById('startBtn').addEventListener('click', startGame);
+  document.getElementById('btnPhish').addEventListener('click', ()=>answer('Phish'));
+  document.getElementById('btnReal').addEventListener('click', ()=>answer('Real'));
+  document.getElementById('nextBtn').addEventListener('click', nextQ);
+  document.getElementById('playAgainBtn').addEventListener('click', startGame);
+}
+
+// Start game
 function startGame(){
-  playerName = prompt("Enter your name for the leaderboard:","");
+  playerName = prompt("Enter your name for the leaderboard:", "");
   if(!playerName) playerName = "Anonymous";
-  questions = shuffle([...QUESTIONS]).slice(0,total);
+
+  questions = shuffle([...QUESTIONS]).slice(0, total);
   current = 0;
   score = 0;
+
   document.getElementById('qTotal').textContent = total;
   document.getElementById('startScreen').classList.add('hidden');
   document.getElementById('endScreen').classList.add('hidden');
   document.getElementById('questionScreen').classList.remove('hidden');
+
   showQ();
 }
 
+// Show current question
 function showQ(){
   const q = questions[current];
-  document.getElementById('qNum').textContent = current+1;
-  const msg = document.getElementById('messageBox');
-  msg.textContent = q.text;
+  document.getElementById('qNum').textContent = current + 1;
+  document.getElementById('messageBox').textContent = q.text;
   document.getElementById('explanation').classList.add('hidden');
   document.getElementById('nextBtn').disabled = true;
   enableButtons(true);
 }
 
+// Handle answer selection
 function answer(choice){
   enableButtons(false);
   const q = questions[current];
   const correct = (choice === q.answer);
   if(correct) score++;
+
   const explanation = document.getElementById('explanation');
   explanation.innerHTML = `<strong>${correct ? 'Correct!' : 'Not quite.'}</strong> ${q.explanation}`;
   explanation.classList.remove('hidden');
+
   document.getElementById('nextBtn').disabled = false;
 }
 
+// Move to next question
 function nextQ(){
   current++;
   if(current >= total){
@@ -119,9 +130,12 @@ function nextQ(){
   }
 }
 
+// End game and show score + Bingo Call
 function endGame(){
   document.getElementById('questionScreen').classList.add('hidden');
   const end = document.getElementById('endScreen');
+
+  // Score display
   document.getElementById('scoreTitle').textContent = `You scored ${score}/${total}`;
   let msg = "Nice work!";
   if(score === total) msg = "Perfect! Cyber Shark!";
@@ -134,8 +148,8 @@ function endGame(){
   // Send results to Power Automate
   if(FLOW_URL && FLOW_URL !== "YOUR_FLOW_URL_HERE"){
     fetch(FLOW_URL,{
-      method:"POST",
-      headers:{'Content-Type':'application/json'},
+      method: "POST",
+      headers: {'Content-Type':'application/json'},
       body: JSON.stringify({
         playerName: playerName,
         score: score,
@@ -143,17 +157,39 @@ function endGame(){
       })
     }).then(res=>{
       console.log("Score sent to Power Automate.");
-      const scoreMsg = document.getElementById('scoreMsg');
-      scoreMsg.textContent += " Your score has been submitted to the leaderboard!";
+      document.getElementById('scoreMsg').textContent += " Your score has been submitted to the leaderboard!";
     }).catch(err=>{
       console.warn("Could not send score:", err);
     });
   }
+
+  // Show Bingo Call after 1 second
+  setTimeout(showBingoCall, 1000);
 }
 
+// Display Bingo Call
+function showBingoCall(){
+  const end = document.getElementById('endScreen');
+
+  // Remove old bingo call if exists
+  const old = document.getElementById('bingoCall');
+  if(old) old.remove();
+
+  const bingo = document.createElement('div');
+  bingo.id = "bingoCall";
+  bingo.style.fontSize = "2em";
+  bingo.style.fontWeight = "bold";
+  bingo.style.textAlign = "center";
+  bingo.style.marginTop = "20px";
+  bingo.textContent = "BINGO CALL"; // Placeholder text
+  end.appendChild(bingo);
+}
+
+// Enable/disable answer buttons
 function enableButtons(ok){
   document.getElementById('btnPhish').disabled = !ok;
   document.getElementById('btnReal').disabled = !ok;
 }
 
+// Initialize when page loads
 document.addEventListener('DOMContentLoaded', init);
