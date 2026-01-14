@@ -1,7 +1,8 @@
 <script>
-// phish-or-real game logic with Power Automate integration
+// Phish-or-Real Game Logic (SharePoint Safe)
 
-const QUESTIONS = [
+// ================= QUESTIONS =================
+var QUESTIONS = [
   {
     text: "URGENT: Your Microsoft 365 password expires today. Click here to reset now: http://secure-login365.co",
     answer: "Phish",
@@ -10,175 +11,187 @@ const QUESTIONS = [
   {
     text: "Your HR team uploaded your annual review to OneDrive. Click the link to view (internal.onedrive.company.com).",
     answer: "Real",
-    explanation: "Looks like an internal link and a normal HR announcement. If in doubt, open OneDrive directly rather than clicking links."
+    explanation: "Looks like an internal link and a normal HR announcement."
   },
   {
     text: "New crypto opportunity! Elon just announced SharkCoin — invest early here!",
     answer: "Phish",
-    explanation: "Celebrity endorsements and 'too-good-to-be-true' promises are common crypto lures. Verify on official channels."
+    explanation: "Celebrity endorsements and 'too-good-to-be-true' promises are common crypto lures."
   },
   {
     text: "You received an MFA code: 281937. If you didn't request this, change your password immediately.",
     answer: "Real",
-    explanation: "MFA codes are common legitimate messages. Treat unexpected codes as a possible sign someone is trying to access your account."
+    explanation: "MFA codes are common legitimate messages."
   },
   {
     text: "We noticed unusual activity on your wallet. Verify your seed phrase below to restore access.",
     answer: "Phish",
-    explanation: "Legitimate services NEVER ask for your seed phrase. Never share private keys or seed phrases."
+    explanation: "Legitimate services NEVER ask for your seed phrase."
   },
   {
     text: "Hi Bob, I forwarded an important doc about the Q4 budget. Can you review and comment?",
     answer: "Real",
-    explanation: "Personalized messages from colleagues are usually real. If request seems odd, verify by contacting the sender directly."
+    explanation: "Personalized messages from colleagues are usually real."
   },
   {
-    text: "Text: 'Your delivery is delayed. Reschedule here: tinyurl.com/deliver123' (from a number you don't recognize).",
+    text: "Text: 'Your delivery is delayed. Reschedule here: tinyurl.com/deliver123'.",
     answer: "Phish",
-    explanation: "Shortened URLs and unknown numbers are red flags. Check tracking via the carrier's official site."
+    explanation: "Shortened URLs and unknown numbers are red flags."
   },
   {
     text: "Email: 'We updated our privacy policy. Please review the changes at https://company.com/privacy'.",
     answer: "Real",
-    explanation: "Official communications use verified company domains and don't pressure you for credentials."
+    explanation: "Official communications use verified domains."
   },
   {
-    text: "DM: 'I can get you early access to TokenX — send me your wallet seed and I'll transfer tokens.'",
+    text: "DM: 'I can get you early access to TokenX — send me your wallet seed.'",
     answer: "Phish",
-    explanation: "Anyone asking for seed phrases or private keys is scamming you. Never share wallet credentials."
+    explanation: "Anyone asking for seed phrases is scamming you."
   },
   {
-    text: "Audio message: 'This is your bank. Press 1 now to confirm a suspicious transaction.'",
+    text: "Audio: 'This is your bank. Press 1 now to confirm a suspicious transaction.'",
     answer: "Phish",
-    explanation: "Unsolicited calls requesting immediate action are scams. Hang up and call your bank using a verified number."
+    explanation: "Unsolicited calls requesting immediate action are scams."
   }
 ];
 
-let questions = [];
-let current = 0;
-let score = 0;
-const total = 10;
+// ================= GAME STATE =================
+var questions = [];
+var current = 0;
+var score = 0;
+var total = 10;
+var playerName = "Anonymous";
+var FLOW_URL = "YOUR_FLOW_URL_HERE";
 
-// Always anonymous (no popup)
-const playerName = "Anonymous";
-
-const FLOW_URL = "YOUR_FLOW_URL_HERE"; // Power Automate HTTP trigger
-
-// Shuffle helper
-function shuffle(a){
-  for(let i = a.length - 1; i > 0; i--){
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
+// ================= HELPERS =================
+function shuffle(arr) {
+  var i, j, temp;
+  for (i = arr.length - 1; i > 0; i--) {
+    j = Math.floor(Math.random() * (i + 1));
+    temp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = temp;
   }
-  return a;
+  return arr;
 }
 
-// Init listeners
-function init(){
-  document.getElementById('startBtn').addEventListener('click', startGame);
-  document.getElementById('btnPhish').addEventListener('click', ()=>answer('Phish'));
-  document.getElementById('btnReal').addEventListener('click', ()=>answer('Real'));
-  document.getElementById('nextBtn').addEventListener('click', nextQ);
-  document.getElementById('playAgainBtn').addEventListener('click', startGame);
+// ================= INIT =================
+function init() {
+  document.getElementById("startBtn").onclick = startGame;
+  document.getElementById("btnPhish").onclick = function () { answer("Phish"); };
+  document.getElementById("btnReal").onclick = function () { answer("Real"); };
+  document.getElementById("nextBtn").onclick = nextQ;
+  document.getElementById("playAgainBtn").onclick = startGame;
 }
 
-// Start game
-function startGame(){
-  questions = shuffle([...QUESTIONS]).slice(0, total);
+// ================= START GAME =================
+function startGame() {
+  questions = shuffle(QUESTIONS.slice(0));
   current = 0;
   score = 0;
 
-  document.getElementById('qTotal').textContent = total;
-  document.getElementById('startScreen').classList.add('hidden');
-  document.getElementById('endScreen').classList.add('hidden');
-  document.getElementById('questionScreen').classList.remove('hidden');
+  document.getElementById("qTotal").innerText = total;
+  document.getElementById("startScreen").className = "hidden";
+  document.getElementById("endScreen").className = "hidden";
+  document.getElementById("questionScreen").className = "";
 
   showQ();
 }
 
-// Show question
-function showQ(){
-  const q = questions[current];
-  document.getElementById('qNum').textContent = current + 1;
-  document.getElementById('messageBox').textContent = q.text;
-  document.getElementById('explanation').classList.add('hidden');
-  document.getElementById('nextBtn').disabled = true;
+// ================= SHOW QUESTION =================
+function showQ() {
+  var q = questions[current];
+  document.getElementById("qNum").innerText = current + 1;
+  document.getElementById("messageBox").innerText = q.text;
+
+  document.getElementById("explanation").className = "hidden";
+  document.getElementById("nextBtn").disabled = true;
+
   enableButtons(true);
 }
 
-// Answer handler
-function answer(choice){
+// ================= ANSWER =================
+function answer(choice) {
   enableButtons(false);
-  const q = questions[current];
-  const correct = choice === q.answer;
-  if(correct) score++;
 
-  const explanation = document.getElementById('explanation');
-  explanation.innerHTML = `<strong>${correct ? 'Correct!' : 'Not quite.'}</strong> ${q.explanation}`;
-  explanation.classList.remove('hidden');
+  var q = questions[current];
+  var correct = (choice === q.answer);
+  if (correct) score++;
 
-  document.getElementById('nextBtn').disabled = false;
+  var explanation = document.getElementById("explanation");
+  explanation.innerHTML =
+    "<strong>" + (correct ? "Correct!" : "Not quite.") + "</strong> " + q.explanation;
+  explanation.className = "";
+
+  document.getElementById("nextBtn").disabled = false;
 }
 
-// Next question
-function nextQ(){
+// ================= NEXT QUESTION =================
+function nextQ() {
   current++;
-  current >= total ? endGame() : showQ();
+  if (current >= total) {
+    endGame();
+  } else {
+    showQ();
+  }
 }
 
-// End game
-function endGame(){
-  document.getElementById('questionScreen').classList.add('hidden');
-  const end = document.getElementById('endScreen');
+// ================= END GAME =================
+function endGame() {
+  document.getElementById("questionScreen").className = "hidden";
 
-  document.getElementById('scoreTitle').textContent = `You scored ${score}/${total}`;
+  var end = document.getElementById("endScreen");
+  document.getElementById("scoreTitle").innerText =
+    "You scored " + score + "/" + total;
 
-  let msg = "Nice work!";
-  if(score === total) msg = "Perfect! Cyber Shark!";
-  else if(score >= Math.ceil(total * 0.8)) msg = "Great job — Cyber Sharp!";
-  else if(score >= Math.ceil(total * 0.5)) msg = "Not bad — keep practicing!";
+  var msg = "Nice work!";
+  if (score === total) msg = "Perfect! Cyber Shark!";
+  else if (score >= Math.ceil(total * 0.8)) msg = "Great job — Cyber Sharp!";
+  else if (score >= Math.ceil(total * 0.5)) msg = "Not bad — keep practicing!";
   else msg = "Watch out — more training recommended.";
 
-  document.getElementById('scoreMsg').textContent = msg;
-  end.classList.remove('hidden');
+  document.getElementById("scoreMsg").innerText = msg;
+  end.className = "";
 
-  // Send to Power Automate
-  if(FLOW_URL && FLOW_URL !== "YOUR_FLOW_URL_HERE"){
-    fetch(FLOW_URL,{
+  if (FLOW_URL && FLOW_URL !== "YOUR_FLOW_URL_HERE") {
+    fetch(FLOW_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        playerName,
-        score,
+        playerName: playerName,
+        score: score,
         timestamp: new Date().toISOString()
       })
-    }).catch(err => console.warn("Flow error:", err));
+    });
   }
 
   setTimeout(showBingoCall, 1000);
 }
 
-// Bingo Call
-function showBingoCall(){
-  const end = document.getElementById('endScreen');
-  document.getElementById('bingoCall')?.remove();
+// ================= BINGO CALL =================
+function showBingoCall() {
+  var end = document.getElementById("endScreen");
 
-  const bingo = document.createElement('div');
+  var old = document.getElementById("bingoCall");
+  if (old) end.removeChild(old);
+
+  var bingo = document.createElement("div");
   bingo.id = "bingoCall";
   bingo.style.fontSize = "2em";
   bingo.style.fontWeight = "bold";
   bingo.style.textAlign = "center";
   bingo.style.marginTop = "20px";
-  bingo.textContent = "BINGO CALL";
+  bingo.innerText = "BINGO CALL";
+
   end.appendChild(bingo);
 }
 
-// Enable buttons
-function enableButtons(ok){
-  document.getElementById('btnPhish').disabled = !ok;
-  document.getElementById('btnReal').disabled = !ok;
+// ================= BUTTON ENABLE =================
+function enableButtons(ok) {
+  document.getElementById("btnPhish").disabled = !ok;
+  document.getElementById("btnReal").disabled = !ok;
 }
 
-document.addEventListener('DOMContentLoaded', init);
+// ================= LOAD =================
+document.addEventListener("DOMContentLoaded", init);
 </script>
-
