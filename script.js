@@ -1,4 +1,4 @@
-rewrite this to remove the pop up block that asks for the name - // phish-or-real game logic with Power Automate integration
+// phish-or-real game logic with Power Automate integration
 
 const QUESTIONS = [
   {
