@@ -181,7 +181,7 @@ function showBingoCall(){
   bingo.style.fontWeight = "bold";
   bingo.style.textAlign = "center";
   bingo.style.marginTop = "20px";
-  bingo.textContent = "BINGO CALL"; // Placeholder text
+  bingo.textContent = "N45"; // Placeholder text
   end.appendChild(bingo);
 }
 
