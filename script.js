@@ -59,7 +59,7 @@ var QUESTIONS = [
 var questions = [];
 var current = 0;
 var score = 0;
-var total = 10;
+var total = QUESTIONS.length;   // ✅ FIX
 var playerName = "Anonymous";
 var FLOW_URL = "YOUR_FLOW_URL_HERE";
 
@@ -86,9 +86,10 @@ function init() {
 
 // ================= START GAME =================
 function startGame() {
-  questions = shuffle(QUESTIONS.slice(0));
+  questions = shuffle(QUESTIONS.slice(0)); // ✅ always clone source
   current = 0;
   score = 0;
+  total = questions.length;               // ✅ sync total
 
   document.getElementById("qTotal").innerText = total;
   document.getElementById("startScreen").className = "hidden";
@@ -101,6 +102,8 @@ function startGame() {
 // ================= SHOW QUESTION =================
 function showQ() {
   var q = questions[current];
+  if (!q) return; // safety guard
+
   document.getElementById("qNum").innerText = current + 1;
   document.getElementById("messageBox").innerText = q.text;
 
@@ -195,3 +198,4 @@ function enableButtons(ok) {
 // ================= LOAD =================
 document.addEventListener("DOMContentLoaded", init);
 </script>
+
