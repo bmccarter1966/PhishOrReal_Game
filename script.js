@@ -1,3 +1,4 @@
+<script>
 // phish-or-real game logic with Power Automate integration
 
 const QUESTIONS = [
@@ -57,11 +58,13 @@ let questions = [];
 let current = 0;
 let score = 0;
 const total = 10;
-let playerName = "";
 
-const FLOW_URL = "YOUR_FLOW_URL_HERE"; // <-- Paste your Power Automate HTTP trigger URL here
+// Always anonymous (no popup)
+const playerName = "Anonymous";
 
-// Shuffle array helper
+const FLOW_URL = "YOUR_FLOW_URL_HERE"; // Power Automate HTTP trigger
+
+// Shuffle helper
 function shuffle(a){
   for(let i = a.length - 1; i > 0; i--){
     const j = Math.floor(Math.random() * (i + 1));
@@ -70,7 +73,7 @@ function shuffle(a){
   return a;
 }
 
-// Initialize event listeners
+// Init listeners
 function init(){
   document.getElementById('startBtn').addEventListener('click', startGame);
   document.getElementById('btnPhish').addEventListener('click', ()=>answer('Phish'));
@@ -81,9 +84,6 @@ function init(){
 
 // Start game
 function startGame(){
-  playerName = prompt("Enter your name for the leaderboard:", "");
-  if(!playerName) playerName = "Anonymous";
-
   questions = shuffle([...QUESTIONS]).slice(0, total);
   current = 0;
   score = 0;
@@ -96,7 +96,7 @@ function startGame(){
   showQ();
 }
 
-// Show current question
+// Show question
 function showQ(){
   const q = questions[current];
   document.getElementById('qNum').textContent = current + 1;
@@ -106,11 +106,11 @@ function showQ(){
   enableButtons(true);
 }
 
-// Handle answer selection
+// Answer handler
 function answer(choice){
   enableButtons(false);
   const q = questions[current];
-  const correct = (choice === q.answer);
+  const correct = choice === q.answer;
   if(correct) score++;
 
   const explanation = document.getElementById('explanation');
@@ -120,60 +120,48 @@ function answer(choice){
   document.getElementById('nextBtn').disabled = false;
 }
 
-// Move to next question
+// Next question
 function nextQ(){
   current++;
-  if(current >= total){
-    endGame();
-  } else {
-    showQ();
-  }
+  current >= total ? endGame() : showQ();
 }
 
-// End game and show score + Bingo Call
+// End game
 function endGame(){
   document.getElementById('questionScreen').classList.add('hidden');
   const end = document.getElementById('endScreen');
 
-  // Score display
   document.getElementById('scoreTitle').textContent = `You scored ${score}/${total}`;
+
   let msg = "Nice work!";
   if(score === total) msg = "Perfect! Cyber Shark!";
-  else if(score >= Math.ceil(total*0.8)) msg = "Great job — Cyber Sharp!";
-  else if(score >= Math.ceil(total*0.5)) msg = "Not bad — keep practicing!";
+  else if(score >= Math.ceil(total * 0.8)) msg = "Great job — Cyber Sharp!";
+  else if(score >= Math.ceil(total * 0.5)) msg = "Not bad — keep practicing!";
   else msg = "Watch out — more training recommended.";
+
   document.getElementById('scoreMsg').textContent = msg;
   end.classList.remove('hidden');
 
-  // Send results to Power Automate
+  // Send to Power Automate
   if(FLOW_URL && FLOW_URL !== "YOUR_FLOW_URL_HERE"){
     fetch(FLOW_URL,{
       method: "POST",
-      headers: {'Content-Type':'application/json'},
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        playerName: playerName,
-        score: score,
+        playerName,
+        score,
         timestamp: new Date().toISOString()
       })
-    }).then(res=>{
-      console.log("Score sent to Power Automate.");
-      document.getElementById('scoreMsg').textContent += " Your score has been submitted to the leaderboard!";
-    }).catch(err=>{
-      console.warn("Could not send score:", err);
-    });
+    }).catch(err => console.warn("Flow error:", err));
   }
 
-  // Show Bingo Call after 1 second
   setTimeout(showBingoCall, 1000);
 }
 
-// Display Bingo Call
+// Bingo Call
 function showBingoCall(){
   const end = document.getElementById('endScreen');
-
-  // Remove old bingo call if exists
-  const old = document.getElementById('bingoCall');
-  if(old) old.remove();
+  document.getElementById('bingoCall')?.remove();
 
   const bingo = document.createElement('div');
   bingo.id = "bingoCall";
@@ -181,15 +169,16 @@ function showBingoCall(){
   bingo.style.fontWeight = "bold";
   bingo.style.textAlign = "center";
   bingo.style.marginTop = "20px";
-  bingo.textContent = "BINGO CALL"; // Placeholder text
+  bingo.textContent = "BINGO CALL";
   end.appendChild(bingo);
 }
 
-// Enable/disable answer buttons
+// Enable buttons
 function enableButtons(ok){
   document.getElementById('btnPhish').disabled = !ok;
   document.getElementById('btnReal').disabled = !ok;
 }
 
-// Initialize when page loads
 document.addEventListener('DOMContentLoaded', init);
+</script>
+
