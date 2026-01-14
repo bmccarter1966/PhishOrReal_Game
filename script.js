@@ -1,3 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Phish-or-Real Game</title>
+<style>
+.hidden { display: none; }
+button { margin: 5px; padding: 10px 20px; font-size: 16px; }
+#messageBox { margin: 20px 0; font-size: 18px; }
+#explanation { margin-top: 10px; font-style: italic; }
+</style>
+</head>
+<body>
+
+<!-- START SCREEN -->
+<div id="startScreen">
+  <h1>Phish-or-Real Game</h1>
+  <button id="startBtn">Start Game</button>
+</div>
+
+<!-- QUESTION SCREEN -->
+<div id="questionScreen" class="hidden">
+  <div>Question <span id="qNum"></span> / <span id="qTotal"></span></div>
+  <div id="messageBox"></div>
+  <button id="btnPhish">Phish</button>
+  <button id="btnReal">Real</button>
+  <button id="nextBtn" class="hidden">Next</button>
+  <div id="explanation"></div>
+</div>
+
+<!-- END SCREEN -->
+<div id="endScreen" class="hidden">
+  <h2 id="scoreTitle"></h2>
+  <div id="scoreMsg"></div>
+  <div id="bingoCall"></div>
+  <button id="playAgainBtn">Play Again</button>
+</div>
+
 <script>
 // ================= QUESTIONS =================
 const QUESTIONS = [
@@ -32,7 +70,6 @@ function shuffle(arr) {
 
 // ================= INIT =================
 function init() {
-  // Ensure buttons exist
   const startBtn = document.getElementById("startBtn");
   const btnPhish = document.getElementById("btnPhish");
   const btnReal = document.getElementById("btnReal");
@@ -65,8 +102,6 @@ function startGame() {
 // ================= SHOW QUESTION =================
 function showQ() {
   const q = questions[current];
-  if (!q) return;
-
   document.getElementById("qNum").textContent = current + 1;
   document.getElementById("messageBox").textContent = q.text;
 
@@ -76,7 +111,7 @@ function showQ() {
 
   const nextBtn = document.getElementById("nextBtn");
   nextBtn.disabled = true;
-  nextBtn.style.display = "none";
+  nextBtn.classList.add("hidden");
 
   enableButtons(true);
 }
@@ -95,10 +130,10 @@ function answer(choice) {
 
   const nextBtn = document.getElementById("nextBtn");
   nextBtn.disabled = false;
-  nextBtn.style.display = "inline-block";
+  nextBtn.classList.remove("hidden");
 }
 
-// ================= NEXT QUESTION =================
+// ================= NEXT =================
 function nextQ() {
   current++;
   if (current >= total) endGame();
@@ -114,7 +149,7 @@ function endGame() {
 
   let msg = "Nice work!";
   if (score === total) msg = "Perfect! Cyber Shark!";
-  else if (score >= Math.ceil(total * 0.8)) msg = "Great job!";
+  else if (score >= Math.ceil(total * 0.8)) msg = "Great job — Cyber Sharp!";
   else if (score >= Math.ceil(total * 0.5)) msg = "Not bad — keep practicing!";
   else msg = "Watch out — more training recommended.";
 
@@ -129,24 +164,17 @@ function endGame() {
     }).catch(err => console.warn("Flow error:", err));
   }
 
-  setTimeout(showBingoCall, 1000);
+  setTimeout(showBingoCall, 500);
 }
 
 // ================= BINGO CALL =================
 function showBingoCall() {
-  const end = document.getElementById("endScreen");
-  const old = document.getElementById("bingoCall");
-  if (old) end.removeChild(old);
-
-  const bingo = document.createElement("div");
-  bingo.id = "bingoCall";
-  bingo.style.fontSize = "2em";
-  bingo.style.fontWeight = "bold";
-  bingo.style.textAlign = "center";
-  bingo.style.marginTop = "20px";
-  bingo.innerText = "BINGO CALL";
-
-  end.appendChild(bingo);
+  const bingoDiv = document.getElementById("bingoCall");
+  bingoDiv.textContent = "BINGO CALL";
+  bingoDiv.style.fontSize = "2em";
+  bingoDiv.style.fontWeight = "bold";
+  bingoDiv.style.textAlign = "center";
+  bingoDiv.style.marginTop = "20px";
 }
 
 // ================= ENABLE BUTTONS =================
@@ -156,11 +184,7 @@ function enableButtons(ok) {
 }
 
 // ================= LOAD =================
-// Works regardless of where <script> is
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", init);
-} else {
-  init();
-}
+document.addEventListener("DOMContentLoaded", init);
 </script>
+
 
