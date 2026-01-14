@@ -17,9 +17,9 @@ const QUESTIONS = [
 let questions = [];
 let current = 0;
 let score = 0;
-let total = QUESTIONS.length;
+const total = QUESTIONS.length;
 const playerName = "Anonymous";
-const FLOW_URL = ""; // Optional Power Automate URL
+const FLOW_URL = ""; // Optional
 
 // ================= HELPERS =================
 function shuffle(arr) {
@@ -32,14 +32,20 @@ function shuffle(arr) {
 
 // ================= INIT =================
 function init() {
-  // Safety: check elements exist
-  if (!document.getElementById("startBtn")) return;
+  // Ensure buttons exist
+  const startBtn = document.getElementById("startBtn");
+  const btnPhish = document.getElementById("btnPhish");
+  const btnReal = document.getElementById("btnReal");
+  const nextBtn = document.getElementById("nextBtn");
+  const playAgainBtn = document.getElementById("playAgainBtn");
 
-  document.getElementById("startBtn").onclick = startGame;
-  document.getElementById("btnPhish").onclick = () => answer("Phish");
-  document.getElementById("btnReal").onclick = () => answer("Real");
-  document.getElementById("nextBtn").onclick = nextQ;
-  document.getElementById("playAgainBtn").onclick = startGame;
+  if (!startBtn || !btnPhish || !btnReal || !nextBtn || !playAgainBtn) return;
+
+  startBtn.addEventListener("click", startGame);
+  btnPhish.addEventListener("click", () => answer("Phish"));
+  btnReal.addEventListener("click", () => answer("Real"));
+  nextBtn.addEventListener("click", nextQ);
+  playAgainBtn.addEventListener("click", startGame);
 }
 
 // ================= START GAME =================
@@ -48,9 +54,7 @@ function startGame() {
   current = 0;
   score = 0;
 
-  total = questions.length;
-
-  document.getElementById("qTotal").innerText = total;
+  document.getElementById("qTotal").textContent = total;
   document.getElementById("startScreen").classList.add("hidden");
   document.getElementById("endScreen").classList.add("hidden");
   document.getElementById("questionScreen").classList.remove("hidden");
@@ -63,8 +67,8 @@ function showQ() {
   const q = questions[current];
   if (!q) return;
 
-  document.getElementById("qNum").innerText = current + 1;
-  document.getElementById("messageBox").innerText = q.text;
+  document.getElementById("qNum").textContent = current + 1;
+  document.getElementById("messageBox").textContent = q.text;
 
   const explanation = document.getElementById("explanation");
   explanation.classList.add("hidden");
@@ -106,18 +110,18 @@ function endGame() {
   document.getElementById("questionScreen").classList.add("hidden");
 
   const end = document.getElementById("endScreen");
-  document.getElementById("scoreTitle").innerText = `You scored ${score}/${total}`;
+  document.getElementById("scoreTitle").textContent = `You scored ${score}/${total}`;
 
   let msg = "Nice work!";
   if (score === total) msg = "Perfect! Cyber Shark!";
-  else if (score >= Math.ceil(total * 0.8)) msg = "Great job — Cyber Sharp!";
+  else if (score >= Math.ceil(total * 0.8)) msg = "Great job!";
   else if (score >= Math.ceil(total * 0.5)) msg = "Not bad — keep practicing!";
   else msg = "Watch out — more training recommended.";
 
-  document.getElementById("scoreMsg").innerText = msg;
+  document.getElementById("scoreMsg").textContent = msg;
   end.classList.remove("hidden");
 
-  if (FLOW_URL && FLOW_URL !== "YOUR_FLOW_URL_HERE") {
+  if (FLOW_URL) {
     fetch(FLOW_URL, {
       method: "POST",
       headers: {"Content-Type": "application/json"},
@@ -145,14 +149,14 @@ function showBingoCall() {
   end.appendChild(bingo);
 }
 
-// ================= ENABLE / DISABLE BUTTONS =================
+// ================= ENABLE BUTTONS =================
 function enableButtons(ok) {
   document.getElementById("btnPhish").disabled = !ok;
   document.getElementById("btnReal").disabled = !ok;
 }
 
 // ================= LOAD =================
-// Attach init safely even if script is in <head>
+// Works regardless of where <script> is
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", init);
 } else {
